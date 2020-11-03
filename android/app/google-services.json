@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "1222046054",
+    "firebase_url": "https://myfixprogram-dev.firebaseio.com",
+    "project_id": "myfixprogram-dev",
+    "storage_bucket": "myfixprogram-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1222046054:android:656de8cb9cfb1030f058a7",
+        "android_client_info": {
+          "package_name": "com.timur.myfitprogram.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1222046054-vnaq3kppq2recpllkoq1qv4f8f846msk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvDuEgZgc7MLHsQzxstmILX4dJQh3kAhU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1222046054-vnaq3kppq2recpllkoq1qv4f8f846msk.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
