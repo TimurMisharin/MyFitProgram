@@ -1,8 +1,13 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import './screens/landing.dart';
 
 //enter to app
-void main() => runApp(MyFitProgram());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyFitProgram());
+}
 
 class MyFitProgram extends StatelessWidget {
   @override
