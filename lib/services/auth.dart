@@ -12,7 +12,7 @@ class AuthService {
       User user = result.user;
       return MyUser.fromFireBase(user);
     } catch (e) {
-      print('signInWithEmailAndPassword: ' + e);
+      print('signInWithEmailAndPassword: ' + e.toString());
       return null;
     }
   }
@@ -25,7 +25,7 @@ class AuthService {
       User user = result.user;
       return MyUser.fromFireBase(user);
     } catch (e) {
-      print('signInWithEmailAndPassword: ' + e);
+      print('signInWithEmailAndPassword: ' + e.toString());
       return null;
     }
   }

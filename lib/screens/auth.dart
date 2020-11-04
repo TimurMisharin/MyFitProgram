@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_fit_program/services/auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+
+import '../domain/myUser.dart';
+import '../services/auth.dart';
 
 class AuthorizationPage extends StatefulWidget {
   @override
@@ -138,9 +141,55 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
       );
     }
 
-    void _buttonAction() {
-      _email = _emailController.text;
-      _password = _passwordController.text;
+    void _loginButtonAction() async {
+      _email = _emailController.text.trim();
+      _password = _passwordController.text.trim();
+
+      if (_email.isEmpty || _password.isEmpty) {
+        return;
+      }
+
+      MyUser user =
+          await _authService.signInWithEmailAndPassword(_email, _password);
+
+      if (user == null) {
+        Fluttertoast.showToast(
+            msg: "Can't SignIn you! Please check your email and password",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        return;
+      }
+
+      _emailController.clear();
+      _passwordController.clear();
+    }
+
+    void _registerButtonAction() async {
+      _email = _emailController.text.trim();
+      _password = _passwordController.text.trim();
+
+      if (_email.isEmpty || _password.isEmpty) {
+        return;
+      }
+
+      MyUser user =
+          await _authService.registerWithEmailAndPassword(_email, _password);
+
+      if (user == null) {
+        Fluttertoast.showToast(
+            msg: "Can't Register you! Please check your email and password",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.CENTER,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+            fontSize: 16.0);
+        return;
+      }
 
       _emailController.clear();
       _passwordController.clear();
@@ -172,7 +221,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
           (showLogin
               ? Column(
                   children: <Widget>[
-                    _form('LOGIN', _buttonAction),
+                    _form('LOGIN', _loginButtonAction),
                     Padding(
                       padding: EdgeInsets.all(10),
                       child: GestureDetector(
@@ -194,7 +243,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
                 )
               : Column(
                   children: <Widget>[
-                    _form('REGISTER', _buttonAction),
+                    _form('REGISTER', _registerButtonAction),
                     Padding(
                       padding: EdgeInsets.all(10),
                       child: GestureDetector(
