@@ -57,6 +57,12 @@ class _HomePageState extends State<HomePage> {
         ),
         body: _sectionIndex == 0 ? ActiveWorkouts() : WorkoutsList(),
         bottomNavigationBar: _navigationBar,
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          backgroundColor: Colors.white,
+          foregroundColor: Theme.of(context).primaryColor,
+          onPressed: () {},
+        ),
       ),
     );
   }
