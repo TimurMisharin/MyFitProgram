@@ -4,7 +4,7 @@ class ActiveWorkouts extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text('TODO'),
+      child: Text('Active workouts'),
     );
   }
 }

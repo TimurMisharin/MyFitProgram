@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 import '../domain/myUser.dart';
 import '../services/auth.dart';
+import '../components/common/toastr.dart';
 
 class AuthorizationPage extends StatefulWidget {
   @override
@@ -153,14 +153,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
           await _authService.signInWithEmailAndPassword(_email, _password);
 
       if (user == null) {
-        Fluttertoast.showToast(
-            msg: "Can't SignIn you! Please check your email and password",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        buildToastr("Can't SignIn you! Please check your email and password");
         return;
       }
 
@@ -180,14 +173,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
           await _authService.registerWithEmailAndPassword(_email, _password);
 
       if (user == null) {
-        Fluttertoast.showToast(
-            msg: "Can't Register you! Please check your email and password",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.CENTER,
-            timeInSecForIosWeb: 1,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-            fontSize: 16.0);
+        buildToastr("Can't Register you! Please check your email and password");
         return;
       }
 

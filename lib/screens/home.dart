@@ -1,5 +1,6 @@
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:my_fit_program/components/common/app-bar-title-text.dart';
 import 'package:my_fit_program/services/auth.dart';
 import '../components/workouts-list.dart';
 import '../components/active-workouts.dart';
@@ -37,10 +38,8 @@ class _HomePageState extends State<HomePage> {
       child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
         appBar: AppBar(
-          title: Text(
-            'My Fit Program // ' +
-                (_sectionIndex == 0 ? 'Active Workouts' : 'Find Workouts'),
-          ),
+          title: AppBarTitleText(
+              (_sectionIndex == 0 ? 'Active Workouts' : 'Find Workouts')),
           leading: Icon(Icons.fitness_center),
           actions: <Widget>[
             FlatButton.icon(

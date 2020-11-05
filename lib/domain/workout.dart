@@ -65,7 +65,7 @@ class WorkoutDrill {
 }
 
 //accepted type of training
-enum WorkoutDrillType { SINGLE, MULTISET, AMRAP, ForTime, EMOM }
+enum WorkoutDrillType { SINGLE, MULTISET, AMRAP, ForTime, EMOM, REST }
 
 abstract class WorkoutDrillsBlock {
   WorkoutDrillType type;
@@ -169,7 +169,7 @@ class WorkoutRestDrillBlock extends WorkoutDrillsBlock {
   int timeMin;
 
   WorkoutRestDrillBlock({this.timeMin})
-      : super(type: WorkoutDrillType.EMOM, drills: []);
+      : super(type: WorkoutDrillType.REST, drills: []);
 
   WorkoutRestDrillBlock copy() {
     return WorkoutRestDrillBlock(timeMin: timeMin);
