@@ -152,15 +152,15 @@ class WorkoutForTimeDrillBlock extends WorkoutDrillsBlock {
   }
 }
 
-class WorkoutEmomDrillBlick extends WorkoutDrillsBlock {
+class WorkoutEmomDrillBlock extends WorkoutDrillsBlock {
   int timeCapMin;
   int intervalMin;
 
-  WorkoutEmomDrillBlick(
+  WorkoutEmomDrillBlock(
       {this.timeCapMin, this.intervalMin, List<WorkoutDrill> drills})
       : super(type: WorkoutDrillType.EMOM, drills: drills);
-  WorkoutEmomDrillBlick copy() {
-    return WorkoutEmomDrillBlick(
+  WorkoutEmomDrillBlock copy() {
+    return WorkoutEmomDrillBlock(
         timeCapMin: timeCapMin, intervalMin: intervalMin, drills: copyDrills());
   }
 }
