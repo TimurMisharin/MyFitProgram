@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
 import '../../domain/workout.dart';
-import '../../core/utils.dart';
 
 class Drill extends StatelessWidget {
   final bool isSingleDrill;
@@ -18,6 +17,10 @@ class Drill extends StatelessWidget {
       this.drill})
       : super(key: key);
 
+  isNumeric(string) =>
+      string != null && int.tryParse(string.toString().trim()) != null;
+  cleanInt(string) => int.parse(string.toString().trim());
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -28,9 +31,9 @@ class Drill extends StatelessWidget {
           children: <Widget>[
             FormBuilderTextField(
               initialValue: drill.title,
-              attribute: 'title_${drillBlockIndex}_$index',
+              attribute: "title_${drillBlockIndex}_$index",
               decoration: InputDecoration(
-                labelText: isSingleDrill ? 'Drill *' : 'Drill #${index + 1}',
+                labelText: isSingleDrill ? "Drill *" : "Drill #${index + 1} *",
               ),
               onChanged: (dynamic val) {
                 drill.title = val;
@@ -42,53 +45,49 @@ class Drill extends StatelessWidget {
             ),
             FormBuilderTextField(
               initialValue: drill.sets == null ? '' : drill.sets.toString(),
-              attribute: 'sets_${drillBlockIndex}_$index',
+              attribute: "sets_${drillBlockIndex}_$index",
               decoration: InputDecoration(
-                labelText: isSingleDrill ? 'Sets *' : 'Sets #${index + 1}',
+                labelText: isSingleDrill ? "Sets *" : "Sets #${index + 1} *",
               ),
               onChanged: (dynamic val) {
-                if (isNumeric(val)) {
-                  drill.sets = cleanInt(val);
-                }
+                if (isNumeric(val)) drill.sets = cleanInt(val);
               },
               validators: [
                 FormBuilderValidators.required(),
-                FormBuilderValidators.maxLength(100),
+                FormBuilderValidators.max(100),
                 FormBuilderValidators.numeric(),
               ],
               keyboardType: TextInputType.number,
             ),
             FormBuilderTextField(
               initialValue: drill.reps == null ? '' : drill.reps.toString(),
-              attribute: 'reps_${drillBlockIndex}_$index',
+              attribute: "reps_${drillBlockIndex}_$index",
               decoration: InputDecoration(
-                labelText: isSingleDrill ? 'Reps *' : 'Reps #${index + 1} *',
+                labelText: isSingleDrill ? "Reps *" : "Reps #${index + 1} *",
               ),
               onChanged: (dynamic val) {
-                if (isNumeric(val)) {
-                  drill.reps = cleanInt(val);
-                }
+                if (isNumeric(val)) drill.reps = cleanInt(val);
               },
               validators: [
                 FormBuilderValidators.required(),
-                FormBuilderValidators.maxLength(500),
+                FormBuilderValidators.max(500),
                 FormBuilderValidators.numeric(),
               ],
               keyboardType: TextInputType.number,
             ),
             FormBuilderTextField(
-              initialValue: drill.weigth,
-              attribute: 'weigth_${drillBlockIndex}_$index',
+              initialValue: drill.weight,
+              attribute: "weight_${drillBlockIndex}_$index",
               decoration: InputDecoration(
-                labelText: isSingleDrill ? 'Weight' : 'Weigth #${index + 1}',
+                labelText: isSingleDrill ? "Weight" : "Weight #${index + 1}",
               ),
               onChanged: (dynamic val) {
-                drill.weigth = val;
+                drill.weight = val;
               },
               validators: [
                 FormBuilderValidators.maxLength(100),
               ],
-            )
+            ),
           ],
         ),
       ),

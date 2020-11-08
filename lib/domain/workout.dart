@@ -7,12 +7,11 @@ class Workout {
   Workout({this.title, this.author, this.description, this.level});
 }
 
-//All workout plan
 class WorkoutSchedule {
   List<WorkoutWeek> weeks;
+
   WorkoutSchedule({this.weeks});
 
-  //deep copy - for modify exist objects
   WorkoutSchedule copy() {
     var copiedWeeks = weeks.map((w) => w.copy()).toList();
     return WorkoutSchedule(weeks: copiedWeeks);
@@ -26,7 +25,7 @@ class WorkoutWeek {
   WorkoutWeek({this.days, this.notes});
 
   WorkoutWeek copy() {
-    var copiedDays = days.map((d) => d.copy()).toList();
+    var copiedDays = days.map((w) => w.copy()).toList();
 
     return WorkoutWeek(days: copiedDays, notes: notes);
   }
@@ -40,8 +39,9 @@ class WorkoutWeekDay {
   List<WorkoutDrillsBlock> drillBlocks;
 
   bool get isSet => drillBlocks != null && drillBlocks.length > 0;
-  int get notRestDrillBlocksCount =>
-      isSet ? drillBlocks.where((b) => !(b is WorkoutDrillsBlock)).length : 0;
+  int get notRestDrillBlocksCount => isSet
+      ? drillBlocks.where((b) => !(b is WorkoutRestDrillBlock)).length
+      : 0;
 
   WorkoutWeekDay({this.drillBlocks, this.notes});
 
@@ -53,19 +53,26 @@ class WorkoutWeekDay {
 
 class WorkoutDrill {
   String title;
-  String weigth;
+  String weight;
   int sets;
   int reps;
 
-  WorkoutDrill({this.title, this.weigth, this.sets, this.reps});
+  WorkoutDrill({this.title, this.weight, this.sets, this.reps});
 
   WorkoutDrill copy() {
-    return WorkoutDrill(title: title, weigth: weigth, sets: sets, reps: reps);
+    return WorkoutDrill(title: title, weight: weight, sets: sets, reps: reps);
   }
 }
 
-//accepted type of training
-enum WorkoutDrillType { SINGLE, MULTISET, AMRAP, ForTime, EMOM, REST }
+enum WorkoutDrillType {
+  SINGLE,
+  MULTISET,
+  AMRAP,
+  ForTime,
+  EMOM,
+  REST
+  //TABATA
+}
 
 abstract class WorkoutDrillsBlock {
   WorkoutDrillType type;
@@ -76,20 +83,14 @@ abstract class WorkoutDrillsBlock {
   void changeDrillsCount(int count) {
     var diff = count - drills.length;
 
-    if (diff == 0) {
-      return;
-    }
-
-    if (diff < 0) {
-      drills = drills.sublist(0, drills.length + diff);
-      return;
-    }
+    if (diff == 0) return;
 
     if (diff > 0) {
       for (int i = 0; i < diff; i++) {
         drills.add(WorkoutDrill());
       }
-      return;
+    } else {
+      drills = drills.sublist(0, drills.length + diff);
     }
   }
 
@@ -100,7 +101,6 @@ abstract class WorkoutDrillsBlock {
   }
 }
 
-//Single workout
 class WorkoutSingleDrillBlock extends WorkoutDrillsBlock {
   WorkoutSingleDrillBlock(WorkoutDrill drill)
       : super(type: WorkoutDrillType.SINGLE, drills: [drill]);
@@ -110,19 +110,18 @@ class WorkoutSingleDrillBlock extends WorkoutDrillsBlock {
   }
 }
 
-//2 and more workout
 class WorkoutMultisetDrillBlock extends WorkoutDrillsBlock {
-  WorkoutMultisetDrillBlock(List<WorkoutDrill> drills)
-      : super(type: WorkoutDrillType.MULTISET, drills: drills);
+  WorkoutMultisetDrillBlock(List<WorkoutDrill> drill)
+      : super(type: WorkoutDrillType.MULTISET, drills: drill);
 
   WorkoutMultisetDrillBlock copy() {
     return WorkoutMultisetDrillBlock(copyDrills());
   }
 }
 
-//number of workouts per some minutes
 class WorkoutAmrapDrillBlock extends WorkoutDrillsBlock {
   int minutes;
+
   WorkoutAmrapDrillBlock({this.minutes, List<WorkoutDrill> drills})
       : super(type: WorkoutDrillType.AMRAP, drills: drills);
 
@@ -159,6 +158,7 @@ class WorkoutEmomDrillBlock extends WorkoutDrillsBlock {
   WorkoutEmomDrillBlock(
       {this.timeCapMin, this.intervalMin, List<WorkoutDrill> drills})
       : super(type: WorkoutDrillType.EMOM, drills: drills);
+
   WorkoutEmomDrillBlock copy() {
     return WorkoutEmomDrillBlock(
         timeCapMin: timeCapMin, intervalMin: intervalMin, drills: copyDrills());

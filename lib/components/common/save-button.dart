@@ -9,11 +9,10 @@ class SaveButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return RaisedButton(
       shape: new RoundedRectangleBorder(
-        borderRadius: new BorderRadius.circular(0.0),
-        side: BorderSide(color: Colors.green),
-      ),
+          borderRadius: new BorderRadius.circular(0.0),
+          side: BorderSide(color: Colors.green)),
       onPressed: () {
-        this.onPressed();
+        onPressed();
       },
       color: Colors.green,
       textColor: Colors.white,

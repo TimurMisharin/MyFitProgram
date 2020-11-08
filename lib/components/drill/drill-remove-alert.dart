@@ -9,17 +9,15 @@ Widget drillRemoveAlert(BuildContext context) {
     ),
     actions: <Widget>[
       FlatButton(
-        onPressed: () {
-          Navigator.pop(context, true);
-        },
-        child: Text('Yes'),
-      ),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+          child: Text('Yes')),
       FlatButton(
-        onPressed: () {
-          Navigator.pop(context, false);
-        },
-        child: Text('No'),
-      )
+          onPressed: () {
+            Navigator.pop(context, false);
+          },
+          child: Text('No')),
     ],
   );
 }
