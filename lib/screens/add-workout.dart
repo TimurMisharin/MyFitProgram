@@ -42,96 +42,83 @@ class _AddWorkoutState extends State<AddWorkout> {
     buildToastr('Ooops! Something is not right!');
   }
 
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AddWorkoutAppBar(
-        titleText: 'Create Workout',
-        onPressCallback: _saveWorkout,
-      ),
-      // AppBar(
-      //   title: Text('My fit program // Create Workout'),
-      //   actions: <Widget>[
-      //     SaveButton(
-      //       onPressed: _saveWorkout,
-      //     ),
-      //   ],
-      // ),
-      body: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(color: bgColorWhite),
-        child: Column(
-          children: <Widget>[
-            FormBuilder(
-              key: _fbKey,
-              initialValue: {},
-              readOnly: false,
-              child: Column(
+        appBar: AddWorkoutAppBar(
+            titleText: 'Create Workout', onPressCallback: _saveWorkout),
+        body: Container(
+          padding: EdgeInsets.all(10),
+          decoration: BoxDecoration(color: bgColorWhite),
+          child: Column(
+            children: <Widget>[
+              FormBuilder(
+                // context,
+                key: _fbKey,
+                initialValue: {},
+                readOnly: false,
+                child: Column(
+                  children: <Widget>[
+                    FormBuilderTextField(
+                      attribute: "title",
+                      decoration: InputDecoration(
+                        labelText: "Title*",
+                      ),
+                      onChanged: (dynamic val) {},
+                      validators: [
+                        FormBuilderValidators.required(),
+                        FormBuilderValidators.maxLength(100),
+                      ],
+                    ),
+                    FormBuilderDropdown(
+                      attribute: "level",
+                      decoration: InputDecoration(
+                        labelText: "Level*",
+                      ),
+                      initialValue: 'Beginner',
+                      allowClear: false,
+                      hint: Text('Select Level'),
+                      validators: [FormBuilderValidators.required()],
+                      items: <String>['Beginner', 'Intermediate', 'Advanced']
+                          .map((level) => DropdownMenuItem(
+                                value: level,
+                                child: Text('$level'),
+                              ))
+                          .toList(),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  FormBuilderTextField(
-                    attribute: "title",
-                    decoration: InputDecoration(labelText: 'Title*'),
-                    onChanged: (dynamic val) {},
-                    validators: [
-                      FormBuilderValidators.required(),
-                      FormBuilderValidators.maxLength(100),
-                    ],
+                  Text(
+                    'Weeks',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  FormBuilderDropdown(
-                    attribute: 'level',
-                    decoration: InputDecoration(
-                      labelText: 'Level*',
-                    ),
-                    initialValue: 'Beginner',
-                    allowClear: false,
-                    hint: Text('Select Level'),
-                    validators: [
-                      FormBuilderValidators.required(),
-                    ],
-                    items: <String>['Beginner', 'Intermediate', 'Advanced'].map(
-                      (level) =>
-                          DropdownMenuItem(value: level, child: Text('$level')),
-                    ),
-                  ),
+                  FlatButton(
+                    child: Icon(Icons.add),
+                    onPressed: () async {
+                      var week = await Navigator.push<WorkoutWeek>(
+                          context,
+                          MaterialPageRoute(
+                              builder: (ctx) => AddWorkoutWeek()));
+                      if (week != null)
+                        setState(() {
+                          workout.weeks.add(week);
+                        });
+                    },
+                  )
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Text(
-                  'Weeks',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                FlatButton(
-                  child: Icon(Icons.add),
-                  onPressed: () async {
-                    var week = await Navigator.push<WorkoutWeek>(context,
-                        MaterialPageRoute(builder: (ctx) => AddWorkoutWeek()));
-                    if (week != null) {
-                      setState(() {
-                        workout.weeks.add(week);
-                      });
-                    }
-                  },
-                ),
-              ],
-            ),
-            workout.weeks.length <= 0
-                ? Text(
-                    'Please add at least one training week',
-                    style: TextStyle(
-                      fontStyle: FontStyle.italic,
-                    ),
-                  )
-                : _buildWeeks()
-          ],
-        ),
-      ),
-    );
+              workout.weeks.length <= 0
+                  ? Text(
+                      'Please add at least one training week',
+                      style: TextStyle(fontStyle: FontStyle.italic),
+                    )
+                  : _buildWeeks()
+            ],
+          ),
+        ));
   }
 
   Widget _buildWeeks() {
