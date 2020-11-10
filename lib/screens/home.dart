@@ -8,43 +8,43 @@ import '../components/active-workouts.dart';
 import './add-workout.dart';
 
 class HomePage extends StatefulWidget {
+  HomePage({Key key}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _sectionIndex = 0;
+  int sectionIndex = 0;
 
   @override
   Widget build(BuildContext context) {
-    var _navigationBar = CurvedNavigationBar(
+    var navigationBar = CurvedNavigationBar(
       items: const <Widget>[
         Icon(Icons.fitness_center),
         Icon(Icons.search),
       ],
       index: 0,
-      height: 50,
+      height: 47,
       color: Colors.white.withOpacity(0.5),
       buttonBackgroundColor: Colors.white,
-      backgroundColor: Colors.white.withOpacity(0.5),
+      backgroundColor: Colors.white.withOpacity(0.35),
       animationCurve: Curves.easeInOut,
       animationDuration: Duration(milliseconds: 500),
       onTap: (int index) {
         setState(() {
-          _sectionIndex = index;
+          sectionIndex = index;
         });
       },
     );
 
-    return Container(
-      child: Scaffold(
-        backgroundColor: Theme.of(context).primaryColor,
-        appBar: AppBar(
-          title: AppBarTitleText(
-              (_sectionIndex == 0 ? 'Active Workouts' : 'Find Workouts')),
-          leading: Icon(Icons.fitness_center),
-          actions: <Widget>[
-            FlatButton.icon(
+    return Scaffold(
+      backgroundColor: Theme.of(context).primaryColor,
+      appBar: AppBar(
+        title: AppBarTitleText( (sectionIndex == 0 ? 'Active Workouts' : 'Find Workouts')),
+        leading: Icon(Icons.fitness_center),
+        actions: <Widget>[
+          FlatButton.icon(
               onPressed: () {
                 AuthService().logOut();
               },
@@ -52,21 +52,18 @@ class _HomePageState extends State<HomePage> {
                 Icons.supervised_user_circle,
                 color: Colors.white,
               ),
-              label: SizedBox.shrink(),
-            )
-          ],
-        ),
-        body: _sectionIndex == 0 ? ActiveWorkouts() : WorkoutsList(),
-        bottomNavigationBar: _navigationBar,
-        floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          backgroundColor: Colors.white,
-          foregroundColor: Theme.of(context).primaryColor,
-          onPressed: () {
-            Navigator.push(
-                context, MaterialPageRoute(builder: (ctx) => AddWorkout()));
-          },
-        ),
+              label: SizedBox.shrink())
+        ],
+      ),
+      body: sectionIndex == 0 ? ActiveWorkouts() : WorkoutsList(),
+      bottomNavigationBar: navigationBar,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        backgroundColor: Colors.white,
+        foregroundColor: Theme.of(context).primaryColor,
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (ctx) => AddWorkout()));
+        },
       ),
     );
   }

@@ -155,10 +155,32 @@ class _AddWorkoutDayState extends State<AddWorkoutDay> {
             initialValue: {},
             readOnly: false,
             child: Column(
-                children: day.drillBlocks.map((block) {
-              var index = day.drillBlocks.indexOf(block);
-              return _buildDrillsBlock(index, block);
-            }).toList()),
+              children: <Widget>[
+                Column(
+                    children: day.drillBlocks.map((block) {
+                  var index = day.drillBlocks.indexOf(block);
+                  return _buildDrillsBlock(index, block);
+                }).toList()),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: FormBuilderTextField(
+                    attribute: "notes",
+                    decoration: InputDecoration(
+                      labelText: "Notes",
+                    ),
+                    initialValue: day.notes,
+                    onChanged: (dynamic val) {
+                      setState(() {
+                        day.notes = val;
+                      });
+                    },
+                    validators: [
+                      FormBuilderValidators.maxLength(500),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../services/database.dart';
+import '../domain/myUser.dart';
 import '../domain/workout.dart';
 
 class WorkoutsList extends StatefulWidget {
@@ -7,39 +11,16 @@ class WorkoutsList extends StatefulWidget {
 }
 
 class _WorkoutsListState extends State<WorkoutsList> {
+  MyUser user;
+  DatabaseService db = DatabaseService();
+
   @override
   void initState() {
-    clearFilter();
+    filter(clear: true);
     super.initState();
   }
 
-  final workouts = <Workout>[
-    Workout(
-        title: 'Test1',
-        author: 'timur1',
-        description: 'Test Workout1',
-        level: 'Beginner'),
-    Workout(
-        title: 'Test2',
-        author: 'timur2',
-        description: 'Test Workout2',
-        level: 'Intermediate'),
-    Workout(
-        title: 'Test3',
-        author: 'timur3',
-        description: 'Test Workout3',
-        level: 'Advanced'),
-    Workout(
-        title: 'Test4',
-        author: 'timur4',
-        description: 'Test Workout4',
-        level: 'Beginner'),
-    Workout(
-        title: 'Test5',
-        author: 'timur5',
-        description: 'Test Workout5',
-        level: 'Intermediate'),
-  ];
+  var workouts = List<Workout>();
 
   var filterHeight = 0.0;
   var filterText = '';
@@ -48,35 +29,40 @@ class _WorkoutsListState extends State<WorkoutsList> {
   var filterLevel = 'Any Level';
   var filterTitleController = TextEditingController();
 
-  List<Workout> filter() {
-    setState(() {
-      filterText = filterOnlyMyWorkouts ? 'My Workouts' : 'All workouts';
-      filterText += '/' + filterLevel;
-      print(filterTitle);
-      if (filterTitle.isNotEmpty) filterText += '/' + filterTitle;
-      filterHeight = 0;
-    });
-
-    var list = workouts;
-    return list;
-  }
-
-  List<Workout> clearFilter() {
-    setState(() {
-      filterText = 'All workouts/Any Level';
+  void filter({bool clear = false}) {
+    if (clear) {
       filterOnlyMyWorkouts = false;
       filterTitle = '';
       filterLevel = 'Any Level';
       filterTitleController.clear();
+    }
+
+    setState(() {
+      filterText = filterOnlyMyWorkouts ? 'My Workouts' : 'All workouts';
+      filterText += '/' + filterLevel;
+      if (filterTitle.isNotEmpty) filterText += '/' + filterTitle;
       filterHeight = 0;
     });
 
-    var list = workouts;
-    return list;
+    loadData();
+  }
+
+  loadData() async {
+    var stream = db.getWorkouts(
+        author: filterOnlyMyWorkouts ? user.id : null,
+        level: filterLevel != 'Any Level' ? filterLevel : null);
+
+    stream.listen((List<Workout> data) {
+      setState(() {
+        workouts = data;
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    user = Provider.of<MyUser>(context);
+
     var filterInfo = Container(
       margin: EdgeInsets.only(top: 3, left: 7, right: 7, bottom: 5),
       decoration: BoxDecoration(color: Colors.white.withOpacity(0.5)),
@@ -94,7 +80,7 @@ class _WorkoutsListState extends State<WorkoutsList> {
         ),
         onPressed: () {
           setState(() {
-            filterHeight = (filterHeight == 0.0 ? 280.0 : 0.0);
+            filterHeight = (filterHeight == 0.0 ? 220.0 : 0.0);
           });
         },
       ),
@@ -128,11 +114,11 @@ class _WorkoutsListState extends State<WorkoutsList> {
                 value: filterLevel,
                 onChanged: (String val) => setState(() => filterLevel = val),
               ),
-              TextFormField(
-                controller: filterTitleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-                onChanged: (String val) => setState(() => filterTitle = val),
-              ),
+              // TextFormField(
+              //   controller: filterTitleController,
+              //   decoration: const InputDecoration(labelText: 'Title'),
+              //   onChanged: (String val) => setState(() => filterTitle = val),
+              // ),
               Row(
                 children: <Widget>[
                   Expanded(
@@ -151,7 +137,7 @@ class _WorkoutsListState extends State<WorkoutsList> {
                     flex: 1,
                     child: RaisedButton(
                       onPressed: () {
-                        clearFilter();
+                        filter(clear: true);
                       },
                       child:
                           Text("Clear", style: TextStyle(color: Colors.white)),
@@ -173,6 +159,7 @@ class _WorkoutsListState extends State<WorkoutsList> {
           itemCount: workouts.length,
           itemBuilder: (context, i) {
             return Card(
+              key: Key(workouts[i].uid),
               elevation: 2.0,
               margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Container(

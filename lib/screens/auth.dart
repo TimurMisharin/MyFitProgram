@@ -27,7 +27,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
           padding: EdgeInsets.only(top: 100),
           child: Container(
               child: Align(
-                  child: Text('MAXFIT',
+                  child: Text('MY FIT PROG',
                       style: TextStyle(
                         fontSize: 45,
                         fontWeight: FontWeight.bold,
