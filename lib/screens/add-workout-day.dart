@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 
+import '../components/common/save-button.dart';
 import '../components/drill/drill-remove-alert.dart';
 import '../components/drill/drill.dart';
 import '../components/common/add-workout-app-bar.dart';
@@ -27,7 +28,7 @@ class _AddWorkoutDayState extends State<AddWorkoutDay> {
     }
 
     if (day.drillBlocks == null || day.drillBlocks.length == 0)
-      day.drillBlocks = [WorkoutSingleDrillBlock(WorkoutDrill())];
+      day.drillBlocks = [WorkoutSingleDrillBlock(drill: WorkoutDrill())];
 
     super.initState();
   }
@@ -53,25 +54,31 @@ class _AddWorkoutDayState extends State<AddWorkoutDay> {
     WorkoutDrillsBlock newBlock;
     switch (_defaultNewDrillType) {
       case 'Single Drill':
-        newBlock = WorkoutSingleDrillBlock(WorkoutDrill());
+        newBlock = WorkoutSingleDrillBlock(drill: WorkoutDrill());
         break;
       case 'Multiset Drill':
-        newBlock = WorkoutMultisetDrillBlock([WorkoutDrill(), WorkoutDrill()]);
+        newBlock =
+            WorkoutMultisetDrillBlock(drills: [WorkoutDrill(), WorkoutDrill()]);
         break;
       case 'For Time':
-        newBlock =
-            WorkoutForTimeDrillBlock(drills: [WorkoutDrill(), WorkoutDrill()]);
+        newBlock = WorkoutForTimeDrillBlock(
+            drills: [WorkoutDrill(), WorkoutDrill()],
+            timeCapMin: 10,
+            rounds: 2,
+            restBetweenRoundsMin: 1);
         break;
       case 'AMRAP':
-        newBlock =
-            WorkoutAmrapDrillBlock(drills: [WorkoutDrill(), WorkoutDrill()]);
+        newBlock = WorkoutAmrapDrillBlock(
+            drills: [WorkoutDrill(), WorkoutDrill()], minutes: 10);
         break;
       case 'EMOM':
-        newBlock =
-            WorkoutEmomDrillBlock(drills: [WorkoutDrill(), WorkoutDrill()]);
+        newBlock = WorkoutEmomDrillBlock(
+            drills: [WorkoutDrill(), WorkoutDrill()],
+            timeCapMin: 10,
+            intervalMin: 1);
         break;
       case 'Rest':
-        newBlock = WorkoutRestDrillBlock();
+        newBlock = WorkoutRestDrillBlock(timeMin: 5);
         break;
     }
 
@@ -138,8 +145,12 @@ class _AddWorkoutDayState extends State<AddWorkoutDay> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AddWorkoutAppBar(
-          titleText: 'Create day plan', onPressCallback: _saveDayPlan),
+      appBar: AppBar(
+        title: Text('MaxFit // Create Day Plan'),
+        actions: <Widget>[
+          SaveButton(onPressed: _saveDayPlan),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.add),
         backgroundColor: Theme.of(context).primaryColor,
@@ -152,6 +163,7 @@ class _AddWorkoutDayState extends State<AddWorkoutDay> {
           decoration: BoxDecoration(color: bgColorWhite),
           child: FormBuilder(
             key: _fbKey,
+            autovalidateMode: AutovalidateMode.disabled,
             initialValue: {},
             readOnly: false,
             child: Column(

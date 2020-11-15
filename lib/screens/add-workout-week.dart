@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:my_fit_program/components/common/save-button.dart';
 
 import '../components/common/add-workout-app-bar.dart';
 import '../core/constants.dart';
@@ -40,11 +41,15 @@ class _AddWorkoutWeekState extends State<AddWorkoutWeek> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AddWorkoutAppBar(
-        titleText: 'Create Week Plan',
-        onPressCallback: () {
-          Navigator.of(context).pop(week);
-        },
+      appBar: AppBar(
+        title: Text('MaxFit // Create Week Plan'),
+        actions: <Widget>[
+          SaveButton(
+            onPressed: () {
+              Navigator.of(context).pop(week);
+            },
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Container(
@@ -117,6 +122,7 @@ class _AddWorkoutWeekState extends State<AddWorkoutWeek> {
                   }),
               FormBuilder(
                 key: _fbKey,
+                autovalidateMode: AutovalidateMode.disabled,
                 initialValue: {},
                 readOnly: false,
                 child: Padding(

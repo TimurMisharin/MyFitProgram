@@ -36,11 +36,16 @@ class DatabaseService {
           (QuerySnapshot data) => data.docs
               .map(
                 (DocumentSnapshot document) => Workout.fromJson(
-                  document.id,
                   document.data(),
+                  id: document.id,
                 ),
               )
               .toList(),
         );
+  }
+
+  Future<WorkoutSchedule> getWorkout(String id) async {
+    var doc = await _workoutSchedulesCollection.doc(id).get();
+    return WorkoutSchedule.fromJson(doc.id, doc.data());
   }
 }

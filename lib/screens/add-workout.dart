@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:my_fit_program/components/common/save-button.dart';
 import 'package:my_fit_program/domain/myUser.dart';
 import 'package:my_fit_program/services/database.dart';
 import 'package:provider/provider.dart';
@@ -23,10 +24,14 @@ class _AddWorkoutState extends State<AddWorkout> {
   final _fbKey = GlobalKey<FormBuilderState>();
   MyUser user;
   WorkoutSchedule workout = WorkoutSchedule(weeks: []);
+  bool isNew = true;
 
   @override
   void initState() {
-    if (widget.workoutSchedule != null) workout = widget.workoutSchedule.copy();
+    if (widget.workoutSchedule != null) {
+      isNew = false;
+      workout = widget.workoutSchedule.copy();
+    }
 
     if (workout.level == null) workout.level = 'Beginner';
 
@@ -40,12 +45,13 @@ class _AddWorkoutState extends State<AddWorkout> {
         return;
       }
 
+      //print(workout.toMap());
       if (workout.uid == null) {
         workout.author = user.id;
       }
 
       await DatabaseService().addOrUpdateWorkout(workout);
-      Navigator.of(context).pop();
+      Navigator.of(context).pop(workout);
     } else {
       buildToastr('Ooops! Something is not right');
     }
@@ -56,105 +62,125 @@ class _AddWorkoutState extends State<AddWorkout> {
     user = Provider.of<MyUser>(context);
 
     return Scaffold(
-      appBar: AddWorkoutAppBar(
-          titleText: 'Create Workout', onPressCallback: _saveWorkout),
-      body: Container(
-        padding: EdgeInsets.all(10),
-        decoration: BoxDecoration(color: bgColorWhite),
-        child: FormBuilder(
-          // context,
-          key: _fbKey,
-          initialValue: {},
-          readOnly: false,
-          child: Column(
-            children: <Widget>[
-              FormBuilderTextField(
-                attribute: "title",
-                decoration: InputDecoration(
-                  labelText: "Title*",
-                ),
-                onChanged: (dynamic val) {
-                  setState(() {
-                    workout.title = val;
-                  });
-                },
-                validators: [
-                  FormBuilderValidators.required(),
-                  FormBuilderValidators.maxLength(100),
-                ],
-              ),
-              FormBuilderDropdown(
-                attribute: "level",
-                decoration: InputDecoration(
-                  labelText: "Level*",
-                ),
-                initialValue: workout.level,
-                allowClear: false,
-                hint: Text('Select Level'),
-                onChanged: (dynamic val) {
-                  setState(() {
-                    workout.level = val;
-                  });
-                },
-                validators: [FormBuilderValidators.required()],
-                items: <String>['Beginner', 'Intermediate', 'Advanced']
-                    .map((level) => DropdownMenuItem(
-                          value: level,
-                          child: Text('$level'),
-                        ))
-                    .toList(),
-              ),
-              FormBuilderTextField(
-                attribute: "description",
-                decoration: InputDecoration(
-                  labelText: "Description*",
-                ),
-                onChanged: (dynamic val) {
-                  setState(() {
-                    workout.description = val;
-                  });
-                },
-                validators: [
-                  FormBuilderValidators.required(),
-                  FormBuilderValidators.maxLength(500),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Text(
-                    'Weeks*',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  FlatButton(
-                    child: Icon(Icons.add),
-                    onPressed: () async {
-                      var week = await Navigator.push<WorkoutWeek>(
-                          context,
-                          MaterialPageRoute(
-                              builder: (ctx) => AddWorkoutWeek()));
-                      if (week != null)
-                        setState(() {
-                          workout.weeks.add(week);
-                        });
-                    },
-                  )
-                ],
-              ),
-              workout.weeks.length <= 0
-                  ? Text(
-                      'Please add at least one training week',
-                      style: TextStyle(fontStyle: FontStyle.italic),
-                    )
-                  : _buildWeeks()
-            ],
-          ),
+        appBar: AppBar(
+          title: Text('MaxFit // ${isNew ? 'Create' : 'Edit'} Workout'),
+          actions: <Widget>[SaveButton(onPressed: _saveWorkout)],
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.add),
+          backgroundColor: Colors.grey,
+          foregroundColor: Theme.of(context).primaryColor,
+          onPressed: () async {
+            var week = await Navigator.push<WorkoutWeek>(
+                context, MaterialPageRoute(builder: (ctx) => AddWorkoutWeek()));
+            if (week != null)
+              setState(() {
+                workout.weeks.add(week);
+              });
+          },
+        ),
+        body: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all(10),
+            decoration: BoxDecoration(color: bgColorWhite),
+            child: FormBuilder(
+              // context,
+              key: _fbKey,
+              autovalidateMode: AutovalidateMode.disabled,
+              initialValue: {},
+              readOnly: false,
+              child: Column(
+                children: <Widget>[
+                  FormBuilderTextField(
+                    initialValue: workout.title,
+                    attribute: "title",
+                    decoration: InputDecoration(
+                      labelText: "Title*",
+                    ),
+                    onChanged: (dynamic val) {
+                      setState(() {
+                        workout.title = val;
+                      });
+                    },
+                    validators: [
+                      FormBuilderValidators.required(),
+                      FormBuilderValidators.maxLength(100),
+                    ],
+                  ),
+                  FormBuilderDropdown(
+                    attribute: "level",
+                    decoration: InputDecoration(
+                      labelText: "Level*",
+                    ),
+                    initialValue: workout.level,
+                    allowClear: false,
+                    hint: Text('Select Level'),
+                    onChanged: (dynamic val) {
+                      setState(() {
+                        workout.level = val;
+                      });
+                    },
+                    validators: [FormBuilderValidators.required()],
+                    items: <String>['Beginner', 'Intermediate', 'Advanced']
+                        .map((level) => DropdownMenuItem(
+                              value: level,
+                              child: Text('$level'),
+                            ))
+                        .toList(),
+                  ),
+                  FormBuilderTextField(
+                    initialValue: workout.description,
+                    attribute: "description",
+                    decoration: InputDecoration(
+                      labelText: "Description*",
+                    ),
+                    onChanged: (dynamic val) {
+                      setState(() {
+                        workout.description = val;
+                      });
+                    },
+                    validators: [
+                      FormBuilderValidators.required(),
+                      FormBuilderValidators.maxLength(500),
+                    ],
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        'Weeks*',
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      // FlatButton(
+                      //   child: Icon(Icons.add),
+                      //   onPressed: () async {
+                      //     var week = await Navigator.push<WorkoutWeek>(
+                      //         context,
+                      //         MaterialPageRoute(
+                      //             builder: (ctx) => AddWorkoutWeek()));
+                      //     if (week != null)
+                      //       setState(() {
+                      //         workout.weeks.add(week);
+                      //       });
+                      //   },
+                      // )
+                    ],
+                  ),
+                  workout.weeks.length <= 0
+                      ? Text(
+                          'Please add at least one training week',
+                          style: TextStyle(fontStyle: FontStyle.italic),
+                        )
+                      : _buildWeeks()
+                ],
+              ),
+            ),
+          ),
+        ));
   }
 
   Widget _buildWeeks() {

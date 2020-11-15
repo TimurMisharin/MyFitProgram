@@ -1,9 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../services/database.dart';
 import '../domain/myUser.dart';
 import '../domain/workout.dart';
+import '../screens/workout-details.dart';
+import '../services/database.dart';
+
+import 'common/workout-level.dart';
 
 class WorkoutsList extends StatefulWidget {
   @override
@@ -12,7 +17,6 @@ class WorkoutsList extends StatefulWidget {
 
 class _WorkoutsListState extends State<WorkoutsList> {
   MyUser user;
-  DatabaseService db = DatabaseService();
 
   @override
   void initState() {
@@ -20,6 +24,17 @@ class _WorkoutsListState extends State<WorkoutsList> {
     super.initState();
   }
 
+  @override
+  void dispose() {
+    if (workoutsStreamSubscription != null) {
+      print('unsubscribing');
+      workoutsStreamSubscription.cancel();
+    }
+    super.dispose();
+  }
+
+  var db = DatabaseService();
+  StreamSubscription<List<Workout>> workoutsStreamSubscription;
   var workouts = List<Workout>();
 
   var filterHeight = 0.0;
@@ -47,12 +62,12 @@ class _WorkoutsListState extends State<WorkoutsList> {
     loadData();
   }
 
-  loadData() async {
+  Future<void> loadData() async {
     var stream = db.getWorkouts(
         author: filterOnlyMyWorkouts ? user.id : null,
         level: filterLevel != 'Any Level' ? filterLevel : null);
 
-    stream.listen((List<Workout> data) {
+    workoutsStreamSubscription = stream.listen((List<Workout> data) {
       setState(() {
         workouts = data;
       });
@@ -114,11 +129,6 @@ class _WorkoutsListState extends State<WorkoutsList> {
                 value: filterLevel,
                 onChanged: (String val) => setState(() => filterLevel = val),
               ),
-              // TextFormField(
-              //   controller: filterTitleController,
-              //   decoration: const InputDecoration(labelText: 'Title'),
-              //   onChanged: (String val) => setState(() => filterTitle = val),
-              // ),
               Row(
                 children: <Widget>[
                   Expanded(
@@ -158,31 +168,37 @@ class _WorkoutsListState extends State<WorkoutsList> {
       child: ListView.builder(
           itemCount: workouts.length,
           itemBuilder: (context, i) {
-            return Card(
-              key: Key(workouts[i].uid),
-              elevation: 2.0,
-              margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Container(
-                decoration:
-                    BoxDecoration(color: Color.fromRGBO(50, 65, 85, 0.9)),
-                child: ListTile(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                  leading: Container(
-                    padding: EdgeInsets.only(right: 12),
-                    child: Icon(Icons.fitness_center,
+            return InkWell(
+              onTap: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (ctx) => WorkoutDetails(id: workouts[i].id)));
+              },
+              child: Card(
+                key: Key(workouts[i].id),
+                elevation: 2.0,
+                margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Container(
+                  decoration:
+                      BoxDecoration(color: Color.fromRGBO(50, 65, 85, 0.9)),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.symmetric(horizontal: 10),
+                    leading: Container(
+                      padding: EdgeInsets.only(right: 12),
+                      child: Icon(Icons.fitness_center,
+                          color: Theme.of(context).textTheme.headline6.color),
+                      decoration: BoxDecoration(
+                          border: Border(
+                              right:
+                                  BorderSide(width: 1, color: Colors.white24))),
+                    ),
+                    title: Text(workouts[i].title,
+                        style: TextStyle(
+                            color: Theme.of(context).textTheme.headline6.color,
+                            fontWeight: FontWeight.bold)),
+                    trailing: Icon(Icons.keyboard_arrow_right,
                         color: Theme.of(context).textTheme.headline6.color),
-                    decoration: BoxDecoration(
-                        border: Border(
-                            right:
-                                BorderSide(width: 1, color: Colors.white24))),
+                    subtitle: WorkoutLevel(level: workouts[i].level),
                   ),
-                  title: Text(workouts[i].title,
-                      style: TextStyle(
-                          color: Theme.of(context).textTheme.headline6.color,
-                          fontWeight: FontWeight.bold)),
-                  trailing: Icon(Icons.keyboard_arrow_right,
-                      color: Theme.of(context).textTheme.headline6.color),
-                  subtitle: subtitle(context, workouts[i]),
                 ),
               ),
             );
@@ -195,41 +211,4 @@ class _WorkoutsListState extends State<WorkoutsList> {
       widgetsList,
     ]);
   }
-}
-
-Widget subtitle(BuildContext context, Workout workout) {
-  var color = Colors.grey;
-  double indicatorLevel = 0;
-
-  switch (workout.level) {
-    case 'Beginner':
-      color = Colors.green;
-      indicatorLevel = 0.33;
-      break;
-    case 'Intermediate':
-      color = Colors.yellow;
-      indicatorLevel = 0.66;
-      break;
-    case 'Advanced':
-      color = Colors.red;
-      indicatorLevel = 1;
-      break;
-  }
-
-  return Row(
-    children: <Widget>[
-      Expanded(
-          flex: 1,
-          child: LinearProgressIndicator(
-              backgroundColor: Theme.of(context).textTheme.headline6.color,
-              value: indicatorLevel,
-              valueColor: AlwaysStoppedAnimation(color))),
-      SizedBox(width: 10),
-      Expanded(
-          flex: 3,
-          child: Text(workout.level,
-              style: TextStyle(
-                  color: Theme.of(context).textTheme.headline6.color)))
-    ],
-  );
 }
