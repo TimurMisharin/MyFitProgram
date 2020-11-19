@@ -9,6 +9,7 @@ import '../services/database.dart';
 import '../domain/myUser.dart';
 import '../domain/workout.dart';
 import './add-workout.dart';
+import 'home.dart';
 
 class WorkoutDetails extends StatefulWidget {
   final String id;
@@ -36,17 +37,21 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
     });
   }
 
-  bool _isAuthor() =>
+  bool _canEdit() =>
       user != null && workout != null && user.id == workout.author;
+
+  bool _canLoad() =>
+      user != null && workout != null && !user.hasActiveWorkout(workout.uid);
 
   Widget _buildHeader(BuildContext context) => Stack(children: <Widget>[
         Container(
-          height: MediaQuery.of(context).size.height * 0.4,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/images/gym.jpg'),
-                  fit: BoxFit.cover)),
-        ),
+            height: MediaQuery.of(context).size.height * 0.4,
+            decoration: new BoxDecoration(
+              image: new DecorationImage(
+                image: new AssetImage("assets/images/gym.jpg"),
+                fit: BoxFit.cover,
+              ),
+            )),
         Container(
           height: MediaQuery.of(context).size.height * 0.4,
           padding: EdgeInsets.all(20.0),
@@ -67,22 +72,45 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
                 },
                 child: Icon(Icons.arrow_back, color: Colors.white),
               ),
-              _isAuthor()
-                  ? IconButton(
-                      icon: Icon(Icons.edit),
-                      color: Colors.white,
-                      onPressed: () async {
-                        var updatedWorkout =
-                            await Navigator.push<WorkoutSchedule>(
+              Row(children: [
+                _canEdit()
+                    ? RaisedButton.icon(
+                        icon: Icon(Icons.edit),
+                        label: Text('EDIT'),
+                        color: Colors.white,
+                        onPressed: () async {
+                          var updatedWorkout =
+                              await Navigator.push<WorkoutSchedule>(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (ctx) => AddWorkout(
+                                            workoutSchedule: workout,
+                                          )));
+                          if (updatedWorkout != null) _loadWorkout();
+                        },
+                      )
+                    : SizedBox.shrink(),
+                SizedBox(width: 10),
+                _canLoad()
+                    ? RaisedButton.icon(
+                        onPressed: () async {
+                          try {
+                            await db.addUserWorkout(user, workout);
+                            Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (ctx) => AddWorkout(
-                                          workoutSchedule: workout,
-                                        )));
-                        if (updatedWorkout != null) _loadWorkout();
-                      },
-                    )
-                  : SizedBox.shrink()
+                                    builder: (ctx) => HomePage()));
+                          } catch (e) {
+                            //TODO: show error message
+                          }
+                          //user.startWorkout(workout);
+                        },
+                        label: Text('LOAD'),
+                        icon: Icon(Icons.cloud_download),
+                        color: Colors.green,
+                      )
+                    : SizedBox.shrink()
+              ])
             ],
           ),
         ),
@@ -382,6 +410,8 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
                       ],
                     ),
                     children: <Widget>[_buildWorkoutDay(day)],
+                    // trailing: Icon(Icons.keyboard_arrow_right,
+                    //     color: Theme.of(context).textTheme.title.color),
                   ),
                 ))
             .toList(),
@@ -415,6 +445,7 @@ class _WorkoutDetailsState extends State<WorkoutDetails> {
           children: workout.weeks
               .map((week) => Container(
                     padding: EdgeInsets.only(top: 5),
+                    //decoration: BoxDecoration(color: Theme.of(context).primaryColor),
                     child: ExpansionTileCard(
                       baseColor: bgColorInactive,
                       expandedColor: bgColorActive,

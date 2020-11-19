@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:my_fit_program/domain/workout.dart';
+
+import '../domain/workout.dart';
+import '../domain/myUser.dart';
 
 class DatabaseService {
   //first collection: workoutsSchedules save all workout data
@@ -9,6 +11,9 @@ class DatabaseService {
 
   final CollectionReference _workoutSchedulesCollection =
       FirebaseFirestore.instance.collection('workoutsSchedules');
+
+  final CollectionReference _userDataCollection =
+      FirebaseFirestore.instance.collection("userData");
 
   Future addOrUpdateWorkout(WorkoutSchedule schedule) async {
     //to save in second collection with same id
@@ -33,7 +38,7 @@ class DatabaseService {
 
     //take from firebase current state of collections
     return query.snapshots().map(
-          (QuerySnapshot data) => data.docs
+          (QuerySnapshot data) => data?.docs
               .map(
                 (DocumentSnapshot document) => Workout.fromJson(
                   document.data(),
@@ -47,5 +52,26 @@ class DatabaseService {
   Future<WorkoutSchedule> getWorkout(String id) async {
     var doc = await _workoutSchedulesCollection.doc(id).get();
     return WorkoutSchedule.fromJson(doc.id, doc.data());
+  }
+
+  // User Data
+  Future updateUserData(MyUser user) async {
+    final userData = user.userData.toMap();
+    await _userDataCollection.doc(user.id).set(userData);
+  }
+
+  Future addUserWorkout(MyUser user, WorkoutSchedule workout) async {
+    var userWorkout = UserWorkout.fromWorkout(workout);
+    user.userData.addUserWorkout(userWorkout);
+    await updateUserData(user);
+  }
+
+  Stream<List<Workout>> getUserWorkouts(MyUser user) {
+    var query = _workoutCollection.where(FieldPath.documentId,
+        whereIn: user.workoutIds);
+
+    return query.snapshots().map((QuerySnapshot data) => data.docs
+        .map((DocumentSnapshot doc) => Workout.fromJson(doc.data(), id: doc.id))
+        .toList());
   }
 }

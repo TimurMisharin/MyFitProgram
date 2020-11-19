@@ -1,14 +1,12 @@
 import 'dart:async';
-
-import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter/material.dart';
+import '../components/common/workout-level.dart';
+import '../screens/workout-details.dart';
 import '../domain/myUser.dart';
 import '../domain/workout.dart';
-import '../screens/workout-details.dart';
 import '../services/database.dart';
-
-import 'common/workout-level.dart';
 
 class WorkoutsList extends StatefulWidget {
   @override
@@ -27,7 +25,6 @@ class _WorkoutsListState extends State<WorkoutsList> {
   @override
   void dispose() {
     if (workoutsStreamSubscription != null) {
-      print('unsubscribing');
       workoutsStreamSubscription.cancel();
     }
     super.dispose();
@@ -129,6 +126,11 @@ class _WorkoutsListState extends State<WorkoutsList> {
                 value: filterLevel,
                 onChanged: (String val) => setState(() => filterLevel = val),
               ),
+              // TextFormField(
+              //   controller: filterTitleController,
+              //   decoration: const InputDecoration(labelText: 'Title'),
+              //   onChanged: (String val) => setState(() => filterTitle = val),
+              // ),
               Row(
                 children: <Widget>[
                   Expanded(
